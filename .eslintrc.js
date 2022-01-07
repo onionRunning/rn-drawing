@@ -6,5 +6,6 @@ module.exports = {
     '@typescript-eslint/no-require-imports': 1,
     camelcase: 0,
     '@typescript-eslint/naming-convention': 0,
+    'no-console': 0,
   },
 };
