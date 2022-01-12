@@ -8,6 +8,7 @@
 - react-navigation 6.0.6
 - eslint-config-5e
 - react-native-canvas
+- redux
 
 ## 项目结构
 

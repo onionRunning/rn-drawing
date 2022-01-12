@@ -1,8 +1,9 @@
-import React, {useRef} from 'react'
-import {Button, View} from 'react-native'
+import React, {useEffect, useRef} from 'react'
+import {View} from 'react-native'
 import Canvas, {CanvasRenderingContext2D} from 'react-native-canvas'
 import {clientWidth} from '@src/global/const'
 import scheduler from './scheduler'
+import {styles} from './utils'
 
 const pixNums = [32, 32]
 
@@ -98,12 +99,23 @@ const baseStep = [
   ],
 ]
 
-const EXCanvas = () => {
+interface Props {
+  isStart?: boolean
+}
+
+const EXCanvas = (props: Props) => {
+  const {isStart} = props
   const canvasRef = useRef<CanvasRenderingContext2D>()
   const [width, height] = [Math.floor(clientWidth), Math.floor(clientWidth)]
   const pixelWidth = width / pixNums[0]
   const pixelHeight = height / pixNums[0]
   const rcn = pixNums[0]
+
+  useEffect(() => {
+    if (isStart) {
+      drawingInfo()
+    }
+  }, [isStart])
 
   const handleCanvas = (canvas: Canvas) => {
     if (!canvas) return
@@ -149,11 +161,8 @@ const EXCanvas = () => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <Canvas ref={handleCanvas} />
-      <Button onPress={drawingInfo} title="hello world!">
-        点我啊铺盖
-      </Button>
     </View>
   )
 }
