@@ -1,20 +1,24 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {View} from 'react-native'
 import Canvas, {CanvasRenderingContext2D} from 'react-native-canvas'
-import {clientWidth} from '@src/global/const'
+import {clientWidth, DRAWING_TYPE} from '@src/global/const'
 import scheduler from './scheduler'
-import {baseStep, styles} from './utils'
+import {styles} from './utils'
 
 const pixNums = [32, 32]
+
+type Points = {x: number; y: number; color: string}
 interface Props {
   // 开始绘画
   isStart?: boolean
   // 开始清除画板
   isInit?: boolean
+
+  points: {type: DRAWING_TYPE; data: Points[]}[]
 }
 
 const EXCanvas = (props: Props) => {
-  const {isStart, isInit} = props
+  const {isStart, isInit, points = []} = props
   const canvasRef = useRef<CanvasRenderingContext2D>()
   const ref = useRef<Canvas>()
   const [isInitActive, setInitActive] = useState(false)
@@ -87,31 +91,37 @@ const EXCanvas = (props: Props) => {
   }
 
   const clearDraw = () => {
-    const ctx = canvasRef.current!
-    baseStep.forEach(step => {
-      step.forEach(path => {
-        const {x, y} = path
-        ctx.fillStyle = '#fff'
-        ctx.fillRect?.(x * pixelWidth + 0.5, y * pixelHeight + 0.5, pixelWidth - 1, pixelHeight - 1)
-      })
+    points?.forEach(step => {
+      const {type, data} = step || {}
+      drawStepPoints(data, type, true)
     })
   }
 
+  // 画椭圆
+  const drawStepPoints = (data: Points[], type: string, isClear?: boolean) => {
+    const ctx = canvasRef.current!
+    data.forEach(path => {
+      const fn = () => {
+        const {x, y, color} = path
+        ctx.fillStyle = isClear ? '#fff' : color
+        ctx.fillRect?.(x * pixelWidth + 0.5, y * pixelHeight + 0.5, pixelWidth - 1, pixelHeight - 1)
+      }
+      if (type === DRAWING_TYPE.circle || isClear) {
+        fn()
+        return
+      }
+      scheduler.call(fn)
+    })
+  }
+
+  // 画非椭圆
+
   // 开始画画
   const drawingInfo = () => {
-    const ctx = canvasRef.current!
-    baseStep.forEach(step => {
-      step.forEach(path => {
-        const {x, y, color} = path
-        scheduler.call(() => {
-          ctx.fillStyle = color
-          ctx.fillRect?.(
-            x * pixelWidth + 0.5,
-            y * pixelHeight + 0.5,
-            pixelWidth - 1,
-            pixelHeight - 1
-          )
-        })
+    points?.forEach(step => {
+      scheduler.call(() => {
+        const {type, data} = step || {}
+        drawStepPoints(data, type)
       })
     })
   }

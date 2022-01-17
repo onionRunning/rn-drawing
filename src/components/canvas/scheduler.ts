@@ -25,7 +25,7 @@ class Scheduler {
       } else {
         this.lock = false
       }
-    }, 10)
+    }, 50)
   }
 }
 
