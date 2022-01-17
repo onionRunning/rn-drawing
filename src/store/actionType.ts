@@ -3,3 +3,5 @@ export const START_LOADING = 'START_LOADING'
 
 // 开始画画
 export const START_DRAWING = 'START_DRAWING'
+// 隐藏画布
+export const INIT_DRAWING = 'INIT_DRAWING'

@@ -7,16 +7,25 @@ import {RootStore} from '~/src/store'
 
 const Home = () => {
   const dispatch = useDispatch()
-  const {isDrawing} = useSelector((state: RootStore) => state.commonReducer)
+  const {isDrawing, isInitDrawing} = useSelector((state: RootStore) => state.commonReducer)
 
+  // 开始画画
   const drawPage = () => {
     dispatch({type: 'START_DRAWING', payload: {isDrawing: true}})
   }
+  // 清除画布
+  const clearDraw = () => {
+    dispatch({type: 'INIT_DRAWING'})
+  }
+  console.error(isInitDrawing, isDrawing, '------')
   return (
     <View style={styles.container}>
-      <EXCanvas isStart={isDrawing} />
+      <EXCanvas isInit={isInitDrawing} isStart={isDrawing} />
       <View style={styles.btn}>
         <Button color="#f0f" onPress={drawPage} title="开始画画" />
+      </View>
+      <View style={styles.btn}>
+        <Button color="#00f" onPress={clearDraw} title="清除画布" />
       </View>
     </View>
   )

@@ -1,111 +1,24 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {View} from 'react-native'
 import Canvas, {CanvasRenderingContext2D} from 'react-native-canvas'
 import {clientWidth} from '@src/global/const'
 import scheduler from './scheduler'
-import {styles} from './utils'
+import {baseStep, styles} from './utils'
 
 const pixNums = [32, 32]
-
-const baseStep = [
-  [
-    {x: 3, y: 30, color: '#f00'},
-    {x: 4, y: 30, color: '#f00'},
-    {x: 5, y: 30, color: '#f00'},
-    {x: 6, y: 30, color: '#f00'},
-    {x: 7, y: 30, color: '#f00'},
-    {x: 8, y: 30, color: '#f00'},
-    {x: 9, y: 30, color: '#f00'},
-  ],
-  [
-    {x: 4, y: 25, color: '#f00'},
-    {x: 5, y: 25, color: '#f00'},
-    {x: 6, y: 25, color: '#f00'},
-    {x: 7, y: 25, color: '#f00'},
-    {x: 8, y: 25, color: '#f00'},
-  ],
-  [
-    {x: 6, y: 30, color: '#f00'},
-    {x: 6, y: 29, color: '#f00'},
-    {x: 6, y: 28, color: '#f00'},
-    {x: 6, y: 27, color: '#f00'},
-    {x: 6, y: 26, color: '#f00'},
-    {x: 6, y: 25, color: '#f00'},
-    {x: 6, y: 24, color: '#f00'},
-    {x: 6, y: 23, color: '#f00'},
-    {x: 6, y: 22, color: '#f00'},
-    {x: 6, y: 21, color: '#f00'},
-    {x: 6, y: 20, color: '#f00'},
-    {x: 6, y: 19, color: '#f00'},
-    {x: 6, y: 18, color: '#f00'},
-  ],
-  [
-    {x: 1, y: 18, color: '#f00'},
-    {x: 2, y: 18, color: '#f00'},
-    {x: 3, y: 18, color: '#f00'},
-    {x: 4, y: 18, color: '#f00'},
-    {x: 5, y: 18, color: '#f00'},
-    {x: 6, y: 18, color: '#f00'},
-    {x: 7, y: 18, color: '#f00'},
-    {x: 8, y: 18, color: '#f00'},
-    {x: 9, y: 18, color: '#f00'},
-    {x: 10, y: 18, color: '#f00'},
-    {x: 11, y: 18, color: '#f00'},
-  ],
-  [
-    {x: 6, y: 1, color: '#f00'},
-    {x: 7, y: 1, color: '#f00'},
-    {x: 8, y: 1, color: '#f00'},
-    {x: 9, y: 2, color: '#f00'},
-    {x: 9, y: 3, color: '#f00'},
-    {x: 9, y: 4, color: '#f00'},
-    {x: 8, y: 5, color: '#f00'},
-    {x: 7, y: 5, color: '#f00'},
-    {x: 6, y: 5, color: '#f00'},
-    {x: 5, y: 4, color: '#f00'},
-    {x: 5, y: 3, color: '#f00'},
-    {x: 5, y: 2, color: '#f00'},
-  ],
-
-  [
-    {x: 5, y: 5, color: '#f0f'},
-    {x: 6, y: 4, color: '#f0f'},
-    {x: 7, y: 4, color: '#f0f'},
-    {x: 8, y: 4, color: '#f0f'},
-    {x: 9, y: 4, color: '#f0f'},
-    {x: 10, y: 4, color: '#f0f'},
-    {x: 11, y: 5, color: '#f0f'},
-    {x: 12, y: 6, color: '#f0f'},
-    {x: 13, y: 7, color: '#f0f'},
-    {x: 13, y: 8, color: '#f0f'},
-    {x: 13, y: 9, color: '#f0f'},
-    {x: 13, y: 10, color: '#f0f'},
-    {x: 13, y: 11, color: '#f0f'},
-    {x: 12, y: 12, color: '#f0f'},
-    {x: 11, y: 13, color: '#f0f'},
-    {x: 10, y: 14, color: '#f0f'},
-    {x: 9, y: 14, color: '#f0f'},
-    {x: 8, y: 14, color: '#f0f'},
-    {x: 7, y: 14, color: '#f0f'},
-    {x: 6, y: 14, color: '#f0f'},
-    {x: 5, y: 13, color: '#f0f'},
-    {x: 4, y: 12, color: '#f0f'},
-    {x: 3, y: 11, color: '#f0f'},
-    {x: 3, y: 10, color: '#f0f'},
-    {x: 3, y: 9, color: '#f0f'},
-    {x: 3, y: 8, color: '#f0f'},
-    {x: 3, y: 7, color: '#f0f'},
-    {x: 4, y: 6, color: '#f0f'},
-  ],
-]
-
 interface Props {
+  // 开始绘画
   isStart?: boolean
+  // 开始清除画板
+  isInit?: boolean
 }
 
 const EXCanvas = (props: Props) => {
-  const {isStart} = props
+  const {isStart, isInit} = props
   const canvasRef = useRef<CanvasRenderingContext2D>()
+  const ref = useRef<Canvas>()
+  const [isInitActive, setInitActive] = useState(false)
+  const [initSuccess, setInitSuccess] = useState(false)
   const [width, height] = [Math.floor(clientWidth), Math.floor(clientWidth)]
   const pixelWidth = width / pixNums[0]
   const pixelHeight = height / pixNums[0]
@@ -117,33 +30,71 @@ const EXCanvas = (props: Props) => {
     }
   }, [isStart])
 
-  const handleCanvas = (canvas: Canvas) => {
+  useEffect(() => {
+    if (isInit) {
+      clearDraw()
+      console.log('执行次数!')
+    }
+  }, [isInit])
+
+  // 初始化画布
+  useEffect(() => {
+    if (initSuccess) {
+      const ctx = ref.current?.getContext?.('2d')
+      if (!ctx) return
+      canvasRef.current = ctx
+    }
+  }, [initSuccess])
+
+  const initCanvas = (canvas: Canvas) => {
     if (!canvas) return
+    if (isInitActive) return
+    ref.current = canvas
+    setInitSuccess(true)
+
     const ctx = canvas?.getContext?.('2d') || {}
     if (!ctx) return
-    canvas.width = Math.floor(clientWidth)
-    canvas.height = Math.floor(clientWidth)
+    canvas.width = width
+    canvas.height = height
     canvasRef.current = ctx
-
     initCanvasCells()
   }
 
-  // 初始化棋盘
+  // 初始化棋盘 利用横竖线进行相交
   const initCanvasCells = () => {
     const ctx = canvasRef.current!
-    ctx.fillStyle = '#ccc'
-    ctx.fillRect(2, 2, width - 4, height)
+    ctx.fillStyle = '#FFF'
+    ctx.fillRect(0, 0, width, height)
     ctx.translate(0, height)
     ctx.rotate((180 / 180) * Math.PI)
     ctx.scale(-1, 1)
-
+    ctx.lineWidth = 1
     for (let i = 0; i < rcn; i++) {
-      for (let j = 0; j < rcn; j++) {
-        ctx.fillStyle = '#fff'
-        ctx.fillRect?.(i * pixelWidth, j * pixelHeight, pixelWidth - 2, pixelHeight - 2)
-      }
+      ctx.beginPath()
+      ctx.strokeStyle = '#ccc'
+      ctx.moveTo(i * pixelWidth, 0)
+      ctx.lineTo(i * pixelWidth, height)
+      ctx.stroke()
     }
-    // console.error(box, '----- box ----')
+    ctx.lineWidth = 1
+    for (let i = 0; i < rcn; i++) {
+      ctx.beginPath()
+      ctx.moveTo(0, i * pixelHeight)
+      ctx.lineTo(width, i * pixelWidth)
+      ctx.stroke()
+    }
+    setInitActive(true)
+  }
+
+  const clearDraw = () => {
+    const ctx = canvasRef.current!
+    baseStep.forEach(step => {
+      step.forEach(path => {
+        const {x, y} = path
+        ctx.fillStyle = '#fff'
+        ctx.fillRect?.(x * pixelWidth + 0.5, y * pixelHeight + 0.5, pixelWidth - 1, pixelHeight - 1)
+      })
+    })
   }
 
   // 开始画画
@@ -154,7 +105,12 @@ const EXCanvas = (props: Props) => {
         const {x, y, color} = path
         scheduler.call(() => {
           ctx.fillStyle = color
-          ctx.fillRect?.(x * pixelWidth, y * pixelHeight, pixelWidth - 2, pixelHeight - 2)
+          ctx.fillRect?.(
+            x * pixelWidth + 0.5,
+            y * pixelHeight + 0.5,
+            pixelWidth - 1,
+            pixelHeight - 1
+          )
         })
       })
     })
@@ -162,7 +118,7 @@ const EXCanvas = (props: Props) => {
 
   return (
     <View style={styles.container}>
-      <Canvas ref={handleCanvas} />
+      <Canvas ref={initCanvas} />
     </View>
   )
 }

@@ -1,7 +1,8 @@
-import {START_DRAWING} from '../../actionType'
+import {INIT_DRAWING, START_DRAWING} from '../../actionType'
 
 const initState = {
   isDrawing: false,
+  isInitDrawing: false,
 }
 
 type State = typeof initState
@@ -17,6 +18,14 @@ const commonReducer = (state = initState, action: Action): State => {
       return {
         ...state,
         isDrawing: action.payload?.isDrawing,
+        isInitDrawing: false,
+      }
+    }
+    case INIT_DRAWING: {
+      return {
+        ...state,
+        isDrawing: false,
+        isInitDrawing: true,
       }
     }
     default: {
