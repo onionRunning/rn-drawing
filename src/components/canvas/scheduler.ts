@@ -8,14 +8,14 @@ class Scheduler {
     this.lock = false
   }
 
-  call(callback: CallBack) {
+  call(callback: CallBack, time?: number) {
     this.task.push(callback)
     if (!this.lock) {
-      this.handler(this.task.shift())
+      this.handler(this.task.shift(), time)
     }
   }
 
-  handler(callback: any) {
+  handler(callback: any, time?: number) {
     this.lock = true
     callback()
     setTimeout(() => {
@@ -25,7 +25,7 @@ class Scheduler {
       } else {
         this.lock = false
       }
-    }, 50)
+    }, time ?? 10)
   }
 }
 

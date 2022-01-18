@@ -110,7 +110,7 @@ const EXCanvas = (props: Props) => {
         fn()
         return
       }
-      scheduler.call(fn)
+      scheduler.call(fn, 50)
     })
   }
 
@@ -122,7 +122,7 @@ const EXCanvas = (props: Props) => {
       scheduler.call(() => {
         const {type, data} = step || {}
         drawStepPoints(data, type)
-      })
+      }, 1000)
     })
   }
 

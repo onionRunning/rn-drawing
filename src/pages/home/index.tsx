@@ -4,7 +4,7 @@ import EXCanvas from '@src/components/canvas'
 import {styles} from './utils'
 import {useDispatch, useSelector} from 'react-redux'
 import {RootStore} from '@src/store'
-import {getEllipticSetPoints} from '@src/tools/utils'
+import {getEllipticSetPoints, getStraightLinePoints} from '@src/tools/utils'
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -21,11 +21,20 @@ const Home = () => {
 
   // 点集合
   const points = [
-    getEllipticSetPoints({startPoints: {x1: 2, y1: 4}, endPoints: {x2: 8, y2: 16}, color: '#f0f'}),
     getEllipticSetPoints({
-      startPoints: {x1: 12, y1: 14},
-      endPoints: {x2: 18, y2: 26},
+      startPoints: {x1: 1, y1: 1},
+      endPoints: {x2: 30, y2: 30},
+      color: '#ff0',
+    }),
+    getStraightLinePoints({
+      startPoints: {x1: 0, y1: 0},
+      endPoints: {x2: 32, y2: 32},
       color: '#f0f',
+    }),
+    getStraightLinePoints({
+      startPoints: {x1: 32, y1: -1},
+      endPoints: {x2: -1, y2: 32},
+      color: '#00f',
     }),
   ]
   return (
