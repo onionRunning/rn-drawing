@@ -8,7 +8,8 @@
 - react-navigation 6.0.6
 - eslint-config-5e
 - react-native-canvas
-- redux
+- redux/redux-thunk
+- @react-native-async-storage 数据储存库
 
 ## 项目结构
 
