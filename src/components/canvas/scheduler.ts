@@ -18,10 +18,11 @@ class Scheduler {
   handler(callback: any, time?: number) {
     this.lock = true
     callback()
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       const nextTask = this.task.shift()
       if (nextTask) {
         this.handler(nextTask)
+        clearTimeout(timer)
       } else {
         this.lock = false
       }

@@ -1,8 +1,9 @@
-import {INIT_DRAWING, START_DRAWING} from '../../actionType'
+import {DRAWING_LAST_STEP, DRAWING_NEXT_STEP, INIT_DRAWING, START_DRAWING} from '../../actionType'
 
 const initState = {
   isDrawing: false,
   isInitDrawing: false,
+  lastStepCount: 0,
 }
 
 type State = typeof initState
@@ -19,6 +20,7 @@ const commonReducer = (state = initState, action: Action): State => {
         ...state,
         isDrawing: action.payload?.isDrawing,
         isInitDrawing: false,
+        lastStepCount: 0,
       }
     }
     case INIT_DRAWING: {
@@ -26,6 +28,18 @@ const commonReducer = (state = initState, action: Action): State => {
         ...state,
         isDrawing: false,
         isInitDrawing: true,
+      }
+    }
+    case DRAWING_LAST_STEP: {
+      return {
+        ...state,
+        lastStepCount: state.lastStepCount + 1,
+      }
+    }
+    case DRAWING_NEXT_STEP: {
+      return {
+        ...state,
+        lastStepCount: state.lastStepCount - 1,
       }
     }
     default: {

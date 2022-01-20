@@ -8,7 +8,9 @@ import {getEllipticSetPoints, getStraightLinePoints} from '@src/tools/utils'
 
 const Home = () => {
   const dispatch = useDispatch()
-  const {isDrawing, isInitDrawing} = useSelector((state: RootStore) => state.commonReducer)
+  const {isDrawing, isInitDrawing, lastStepCount} = useSelector(
+    (state: RootStore) => state.commonReducer
+  )
 
   // 开始画画
   const drawPage = () => {
@@ -17,6 +19,11 @@ const Home = () => {
   // 清除画布
   const clearDraw = () => {
     dispatch({type: 'INIT_DRAWING'})
+  }
+
+  const enterLastStep = () => {
+    if (lastStepCount >= points.length) return
+    dispatch({type: 'DRAWING_LAST_STEP'})
   }
 
   // 点集合
@@ -39,12 +46,20 @@ const Home = () => {
   ]
   return (
     <View style={styles.container}>
-      <EXCanvas isInit={isInitDrawing} isStart={isDrawing} points={points} />
+      <EXCanvas
+        isInit={isInitDrawing}
+        isStart={isDrawing}
+        lastStepCount={lastStepCount}
+        points={points}
+      />
       <View style={styles.btn}>
         <Button color="#f0f" onPress={drawPage} title="开始画画" />
       </View>
       <View style={styles.btn}>
         <Button color="#00f" onPress={clearDraw} title="清除画布" />
+      </View>
+      <View style={styles.btn}>
+        <Button color="#0f0" onPress={enterLastStep} title="回到上一步" />
       </View>
     </View>
   )

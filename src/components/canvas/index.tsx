@@ -14,11 +14,14 @@ interface Props {
   // 开始清除画板
   isInit?: boolean
 
+  // 回到第n步
+  lastStepCount?: number
+
   points: {type: DRAWING_TYPE; data: Points[]}[]
 }
 
 const EXCanvas = (props: Props) => {
-  const {isStart, isInit, points = []} = props
+  const {isStart, isInit, points = [], lastStepCount = 0} = props
   const canvasRef = useRef<CanvasRenderingContext2D>()
   const ref = useRef<Canvas>()
   const [isInitActive, setInitActive] = useState(false)
@@ -30,9 +33,26 @@ const EXCanvas = (props: Props) => {
 
   useEffect(() => {
     if (isStart) {
+      clearDraw()
       drawingInfo()
     }
   }, [isStart])
+
+  useEffect(() => {
+    if (lastStepCount || isInit) {
+      const prePoints = points.slice(points.length - lastStepCount, points.length)
+      const afterPoints = points?.slice(0, points.length - lastStepCount)
+      prePoints.forEach(step => {
+        const {type, data} = step || {}
+        drawStepPoints(data, type, {isClear: true})
+      })
+
+      afterPoints?.forEach(step => {
+        const {type, data} = step || {}
+        drawStepPoints(data, type, {isRewrite: true})
+      })
+    }
+  }, [lastStepCount])
 
   useEffect(() => {
     if (isInit) {
@@ -93,20 +113,25 @@ const EXCanvas = (props: Props) => {
   const clearDraw = () => {
     points?.forEach(step => {
       const {type, data} = step || {}
-      drawStepPoints(data, type, true)
+      drawStepPoints(data, type, {isClear: true})
     })
   }
 
   // 画椭圆
-  const drawStepPoints = (data: Points[], type: string, isClear?: boolean) => {
+  const drawStepPoints = (
+    data: Points[],
+    type: string,
+    params?: {isClear?: boolean; isRewrite?: boolean}
+  ) => {
     const ctx = canvasRef.current!
+    const {isClear, isRewrite} = params || {}
     data.forEach(path => {
       const fn = () => {
         const {x, y, color} = path
         ctx.fillStyle = isClear ? '#fff' : color
         ctx.fillRect?.(x * pixelWidth + 0.5, y * pixelHeight + 0.5, pixelWidth - 1, pixelHeight - 1)
       }
-      if (type === DRAWING_TYPE.circle || isClear) {
+      if (type === DRAWING_TYPE.circle || isClear || isRewrite) {
         fn()
         return
       }
