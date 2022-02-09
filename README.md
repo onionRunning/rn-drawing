@@ -1,10 +1,9 @@
-# 画板app
+# 画板app: pixel-artboard-rn
 
 ## 技术栈
 
 - react-native    0.66.x
 - typescript      4.5.4
-- sqlite
 - react-navigation 6.0.6
 - eslint-config-5e
 - react-native-canvas
@@ -19,6 +18,9 @@
 - pages 业务页面
 - store 状态管理
 - router 路由管理
+- tools 工具相关
+- server 服务端相关
+- db 储存信息
 
 ## link
 
